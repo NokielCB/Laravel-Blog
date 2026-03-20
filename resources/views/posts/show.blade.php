@@ -6,7 +6,7 @@
         <article class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
             <!-- Featured Image -->
             <div class="h-96 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                <span class="text-9xl">🚀</span>
+                <span class="text-9xl">{{ $post->photo ?? '📝' }}</span>
             </div>
 
             <!-- Post Content -->
@@ -16,24 +16,29 @@
                     <div class="flex items-center gap-3">
                         <div
                             class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-lg font-semibold">
-                            JK
+                            {{ strtoupper(substr($post->author, 0, 2)) }}
                         </div>
                         <div>
-                            <p class="font-semibold text-gray-900">Jan Kowalski</p>
-                            <p class="text-sm text-gray-500">Opublikowano: 15 grudnia 2024</p>
+                            <p class="font-semibold text-gray-900">{{ $post->author }}</p>
+                            <p class="text-sm text-gray-500">Opublikowano: {{ $post->created_at->format('d F Y') }}</p>
                         </div>
                     </div>
                     <div class="ml-auto flex gap-2">
-                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-semibold rounded-full">
-                            Laravel
-                        </span>
-                        <span class="text-gray-500 text-sm">5 min czytania</span>
+                        @if ($post->is_published)
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
+                                Opublikowany
+                            </span>
+                        @else
+                            <span class="px-3 py-1 bg-gray-100 text-gray-800 text-xs font-semibold rounded-full">
+                                Szkic
+                            </span>
+                        @endif
                     </div>
                 </div>
 
                 <!-- Title -->
                 <h1 class="text-4xl font-bold text-gray-900 mb-4">
-                    Rozpoczęcie przygody z Laravel 11
+                    {{ $post->title }}
                 </h1>
 
                 <!-- Lead -->
@@ -44,43 +49,8 @@
 
                 <!-- Content -->
                 <div class="prose prose-lg max-w-none">
-                    <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">Czym jest Laravel?</h2>
-                    <p class="text-gray-700 mb-4 leading-relaxed">
-                        Laravel to najpopularniejszy framework PHP, który rewolucjonizuje sposób tworzenia aplikacji
-                        webowych. Dzięki eleganckiej składni, potężnemu ORM (Eloquent) i szerokiemu ekosystemowi
-                        narzędzi,
-                        Laravel pozwala skupić się na logice biznesowej zamiast na boilerplate.
-                    </p>
-
-                    <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">Konfiguracja środowiska</h2>
-                    <p class="text-gray-700 mb-4 leading-relaxed">
-                        Laravel Sail to oficjalny interfejs do pracy z Dockerem. Dzięki niemu nie musisz instalować PHP,
-                        MySQL czy Redis lokalnie - wszystko działa w kontenerach!
-                    </p>
-
-                    <div class="bg-gray-900 text-gray-100 rounded-lg p-4 mb-6 font-mono text-sm overflow-x-auto">
-                        <code>
-                            # Instalacja nowego projektu<br>
-                            curl -s https://laravel.build/moj-blog | bash<br>
-                            <br>
-                            # Uruchomienie kontenerów<br>
-                            cd moj-blog<br>
-                            ./vendor/bin/sail up -d
-                        </code>
-                    </div>
-
-                    <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">Pierwsze kroki</h2>
-                    <p class="text-gray-700 mb-4 leading-relaxed">
-                        Po uruchomieniu Sail, Twoja aplikacja jest dostępna pod adresem <span
-                            class="font-mono bg-gray-100 px-2 py-1 rounded">http://localhost</span>. Teraz możesz zacząć
-                        tworzyć modele, migracje i
-                        kontrolery.
-                    </p>
-
-                    <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">Podsumowanie</h2>
-                    <p class="text-gray-700 mb-4 leading-relaxed">
-                        Laravel 11 wprowadza wiele ulepszeń, w tym lepszą wydajność i uproszczoną strukturę projektu. To
-                        idealny moment, aby rozpocząć swoją przygodę z tym frameworkiem!
+                    <p class="text-gray-700 mb-4 leading-relaxed whitespace-pre-line">
+                        {{ $post->content }}
                     </p>
                 </div>
 

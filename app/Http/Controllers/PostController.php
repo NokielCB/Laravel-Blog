@@ -9,12 +9,20 @@ class PostController extends Controller
 {
     public function index()
     {
-        return view('posts.index');
+        $posts = Post::all();
+
+        return view('posts.index', [
+            'posts' => $posts
+        ]);
     }
 
     public function show(string $slug)
     {
-        return view('posts.show');
+        $post = Post::where('slug', $slug)->firstOrFail();
+
+        return view('posts.show', [
+            'post' => $post
+        ]);
     }
 
     public function create()
