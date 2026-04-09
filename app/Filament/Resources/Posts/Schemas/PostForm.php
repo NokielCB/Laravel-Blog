@@ -24,8 +24,6 @@ class PostForm
                 RichEditor::make('content')
                     ->required()
                     ->columnSpanFull(),
-                TextInput::make('author')
-                    ->required(),
                 Toggle::make('is_published')
                     ->required(),
                 FileUpload::make('photo')

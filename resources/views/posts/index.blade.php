@@ -8,18 +8,39 @@
         </div>
 
         <!-- Filters/Search Bar -->
-        <div class="mb-6 flex flex-col sm:flex-row gap-4">
+        <form method="GET" action="{{ route('posts.index') }}" class="mb-6 flex flex-col sm:flex-row gap-4">
             <div class="flex-1">
-                <input type="text" placeholder="Szukaj postów..."
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ $search ?? '' }}"
+                    placeholder="Szukaj postow po tytule..."
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                >
             </div>
-            <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                <option>Wszystkie kategorie</option>
-                <option>Laravel</option>
-                <option>React</option>
-                <option>AI & Copilot</option>
-            </select>
-        </div>
+            <div class="flex gap-2">
+                <button
+                    type="submit"
+                    class="px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700"
+                >
+                    Szukaj
+                </button>
+                @if (!empty($search))
+                    <a
+                        href="{{ route('posts.index') }}"
+                        class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                    >
+                        Wyczyść
+                    </a>
+                @endif
+            </div>
+        </form>
+
+        @if (!empty($search))
+            <p class="mb-4 text-sm text-gray-600">
+                Wyniki dla: <span class="font-semibold text-gray-900">{{ $search }}</span> ({{ $posts->count() }})
+            </p>
+        @endif
 
         <!-- Posts Grid -->
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -27,9 +48,16 @@
             @forelse ($posts as $post)
                 <article
                     class="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-                    <div class="h-48 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                        <span class="text-6xl">{{ $post->photo ?? '📝' }}</span>
-                    </div>
+                    @if ($post->photo)
+                        <div class="h-48">
+                            <img src="{{ Storage::disk('public')->url($post->photo) }}" alt="{{ $post->title }}"
+                                class="w-full h-full object-cover" loading="lazy">
+                        </div>
+                    @else
+                        <div class="h-48 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                            <span class="text-6xl">📝</span>
+                        </div>
+                    @endif
                     <div class="p-6">
                         <div class="flex items-center gap-2 mb-3">
                             @if ($post->is_published)
@@ -52,9 +80,9 @@
                             <div class="flex items-center gap-2">
                                 <div
                                     class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-sm font-semibold">
-                                    {{ strtoupper(substr($post->author, 0, 2)) }}
+                                        {{ strtoupper(substr($post->user?->name ?? 'Autor', 0, 2)) }}
                                 </div>
-                                <span class="text-sm text-gray-700 font-medium">{{ $post->author }}</span>
+                                <span class="text-sm text-gray-700 font-medium">{{ $post->user?->name ?? 'Autor' }}</span>
                             </div>
                             <span class="text-sm text-gray-500">{{ $post->created_at->diffForHumans() }}</span>
                         </div>

@@ -27,7 +27,8 @@ class PostsTable
                     ->limit(50)
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('author')
+                TextColumn::make('user.name')
+                    ->label('Author')
                     ->badge()
                     ->color('info')
                     ->searchable(),

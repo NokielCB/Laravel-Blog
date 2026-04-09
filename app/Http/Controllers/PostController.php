@@ -7,18 +7,33 @@ use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::all();
+        $search = trim((string) $request->query('search', ''));
+
+        $posts = Post::with('user')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where('title', 'like', '%' . $search . '%');
+            })
+            ->get();
 
         return view('posts.index', [
             'posts' => $posts,
+            'search' => $search,
         ]);
     }
 
     public function show(string $slug)
     {
-        $post = Post::where('slug', $slug)->firstOrFail();
+        $post = Post::with([
+            'user',
+            'topLevelComments.user',
+            'topLevelComments.likes',
+            'topLevelComments.replies.user',
+            'topLevelComments.replies.likes',
+        ])
+            ->where('slug', $slug)
+            ->firstOrFail();
 
         return view('posts.show', [
             'post' => $post,
@@ -36,21 +51,26 @@ class PostController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255', 'unique:posts,slug'],
             'lead' => ['nullable', 'string'],
-            'author' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
+            'is_published' => ['nullable', 'boolean'],
         ]);
 
-        $post = new Post;
+        $photoPath = null;
 
-        $post->title = $parameters['title'];
-        $post->slug = $parameters['slug'];
-        $post->lead = $parameters['lead'] ?? null;
-        $post->author = $parameters['author'];
-        $post->content = $parameters['content'];
+        if ($request->hasFile('photo')) {
+            $photoPath = $request->file('photo')->store('posts', 'public');
+        }
 
-        // Post::create($parameters);
-
-        $post->save();
+        Post::create([
+            'title' => $parameters['title'],
+            'slug' => $parameters['slug'],
+            'lead' => $parameters['lead'] ?? null,
+            'content' => $parameters['content'],
+            'photo' => $photoPath,
+            'is_published' => $request->boolean('is_published'),
+            'user_id' => $request->user()->id,
+        ]);
 
         return redirect()->route('posts.index');
     }
