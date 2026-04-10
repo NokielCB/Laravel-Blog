@@ -106,6 +106,29 @@
 
         <!-- Comments Section -->
         <section class="bg-white rounded-lg shadow-md p-8">
+            @php
+                $authorInitials = function (?string $name): string {
+                    $name = trim($name ?? 'Gosc');
+
+                    if ($name === '') {
+                        return 'GO';
+                    }
+
+                    $parts = preg_split('/\s+/', $name) ?: [];
+                    $initials = '';
+
+                    foreach (array_slice($parts, 0, 2) as $part) {
+                        $initials .= mb_strtoupper(mb_substr($part, 0, 1));
+                    }
+
+                    if ($initials === '') {
+                        return mb_strtoupper(mb_substr($name, 0, 2));
+                    }
+
+                    return $initials;
+                };
+            @endphp
+
             <h2 class="text-2xl font-bold text-gray-900 mb-6">
                 Komentarze ({{ $post->topLevelComments->count() }})
             </h2>
@@ -198,10 +221,13 @@
             <!-- Comments List -->
             <div class="space-y-6">
                 @forelse ($post->topLevelComments as $comment)
+                    @php
+                        $commentAuthorName = $comment->user?->name ?? $comment->author ?? 'Gosc';
+                    @endphp
                     <div class="flex gap-4">
                         <div class="flex-shrink-0">
                             <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
-                                {{ strtoupper(substr($comment->user?->name ?? $comment->author ?? 'G', 0, 2)) }}
+                                {{ $authorInitials($commentAuthorName) }}
                             </div>
                         </div>
 
@@ -209,7 +235,7 @@
                             <div class="bg-gray-50 rounded-lg p-4">
                                 <div class="flex items-center justify-between mb-2">
                                     <h4 class="font-semibold text-gray-900">
-                                        {{ $comment->user?->name ?? $comment->author ?? 'Gosc' }}
+                                        {{ $commentAuthorName }}
                                     </h4>
                                     <span class="text-sm text-gray-500">{{ $comment->created_at->diffForHumans() }}</span>
                                 </div>
@@ -276,11 +302,19 @@
                                 @if ($comment->replies->isNotEmpty())
                                     <div class="mt-5 space-y-3 pl-4 border-l-2 border-gray-200">
                                         @foreach ($comment->replies as $reply)
+                                            @php
+                                                $replyAuthorName = $reply->user?->name ?? $reply->author ?? 'Gosc';
+                                            @endphp
                                             <div class="rounded-lg bg-white border border-gray-200 p-4">
                                                 <div class="flex items-center justify-between mb-2">
-                                                    <h5 class="text-sm font-semibold text-gray-900">
-                                                        {{ $reply->user?->name ?? $reply->author ?? 'Gosc' }}
-                                                    </h5>
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-700">
+                                                            {{ $authorInitials($replyAuthorName) }}
+                                                        </span>
+                                                        <h5 class="text-sm font-semibold text-gray-900">
+                                                            {{ $replyAuthorName }}
+                                                        </h5>
+                                                    </div>
                                                     <span class="text-xs text-gray-500">{{ $reply->created_at->diffForHumans() }}</span>
                                                 </div>
 

@@ -10,16 +10,16 @@
                 <div class="flex items-center space-x-4">
                     <a href="{{ route('posts.index') }}"
                         class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
-                        Home
+                        Strona glowna
                     </a>
                     @auth
-                        <a href="{{ route('posts.create') }}"
-                            class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
-                            Nowy Post
-                        </a>
                         <a href="{{ route('dashboard') }}"
                             class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
                             Dashboard
+                        </a>
+                        <a href="{{ route('profile') }}"
+                            class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                            Profil
                         </a>
                         @if(auth()->user()->is_admin)
                             <a href="{{ route('filament.admin.pages.dashboard') }}"
@@ -27,13 +27,10 @@
                                 Panel Admina
                             </a>
                         @endif
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit"
-                                class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
-                                Wyloguj
-                            </button>
-                        </form>
+                        <a href="{{ route('posts.create') }}"
+                            class="ml-auto bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
+                            Nowy Post
+                        </a>
                     @else
                         <a href="{{ route('login') }}"
                             class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">

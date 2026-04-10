@@ -25,6 +25,11 @@ class CommentController extends Controller
         $parameters = $request->validate($rules);
 
         $parentId = $parameters['parent_id'] ?? null;
+        $isAdmin = (bool) $request->user()?->is_admin;
+
+        $status = $isAdmin ? 'approved' : 'pending';
+        $approvedBy = $isAdmin ? $request->user()?->id : null;
+        $approvedAt = $isAdmin ? now() : null;
 
         if ($parentId !== null) {
             $parentComment = Comment::query()
@@ -47,14 +52,20 @@ class CommentController extends Controller
             'author' => $request->user()?->name ?? $parameters['author'],
             'email' => $request->user()?->email ?? $parameters['email'],
             'content' => $parameters['content'],
-            'status' => 'pending',
+            'status' => $status,
+            'approved_by' => $approvedBy,
+            'approved_at' => $approvedAt,
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
 
+        $flashMessage = $isAdmin
+            ? 'Komentarz zostal opublikowany od razu (konto administratora).'
+            : 'Komentarz zostal wyslany i czeka na moderacje administratora.';
+
         return redirect()
             ->route('posts.show', $post->slug)
-            ->with('comment_submitted', 'Komentarz zostal wyslany i czeka na moderacje administratora.');
+            ->with('comment_submitted', $flashMessage);
     }
 
     public function toggleLike(Request $request, Comment $comment)

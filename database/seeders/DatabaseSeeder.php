@@ -16,18 +16,23 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Create admin user
-        User::factory()->create([
-            'name' => 'Admin',
+        User::query()->updateOrCreate([
             'email' => 'admin@example.com',
+        ], [
+            'name' => 'Admin',
             'password' => 'admin123456',
             'is_admin' => true,
         ]);
 
         // Create regular test user
-        User::factory()->create([
-            'name' => 'Test User',
+        User::query()->updateOrCreate([
             'email' => 'test@example.com',
+        ], [
+            'name' => 'Test User',
+            'password' => 'test123456',
             'is_admin' => false,
         ]);
+
+        $this->call(AiLaravelPostsSeeder::class);
     }
 }
